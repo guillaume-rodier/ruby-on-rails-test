@@ -1,0 +1,15 @@
+version: '3'
+services:
+  db:
+    image: postgres:10.11-alpine
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+  wakeo_test:
+    build: .
+    working_dir: /wakeo_test
+    volumes:
+      - .:/wakeo_test
+    depends_on:
+      - db
+    ports:
+      - 6001:6001

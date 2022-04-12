@@ -1,0 +1,141 @@
+    openapi: 3.0.0
+    info:
+      title: Wakeo Technical Test API
+      description: API routes used on the wakeo_back_candidate_test app.
+      version: 0.1.9
+    servers:
+      - url: http://localhost:6001/
+    paths:
+      /orders:
+        get:
+          summary: Orders Index
+          tags: 
+          - Internal
+          description: Returns a list of all orders.
+          responses:
+            '200':
+              description: A JSON array of orders
+              content:
+                application/json:
+                  schema: 
+                    type: array
+                    items: 
+                      type: object
+                      properties:
+                        reference:
+                          type: string
+                          example: 999-444-4444
+                        departure_date:
+                          type: string
+                          format: date-time
+                        arrival_date:
+                          type: string
+                          format: date-time
+                        client_name:
+                          type: string
+                          example: Wakeo
+                        departure_city:
+                          type: string
+                          example: Paris
+                        arrival_city:
+                          type: string
+                          example: Marseille
+                        active:
+                          type: boolean
+      /orders/active:
+        get:
+          summary: Acitve Orders Index
+          tags: 
+          - Internal
+          description: Returns an array of active orders corresponding to search criteria. If no parameter is given, the route returns all active orders. An active order is defined by `active = true`
+          parameters:
+            - name: q
+              in: query
+              required: false
+              description: The parameter will be searched on the reference, the cities or the client name.
+              schema:
+                type: string
+          responses:
+            '200':
+              description: A JSON array of orders
+              content:
+                application/json:
+                  schema: 
+                    type: array
+                    items: 
+                      type: object
+                      properties:
+                        reference:
+                          type: string
+                          example: 999-444-4444
+                        departure_date:
+                          type: string
+                          format: date-time
+                        arrival_date:
+                          type: string
+                          format: date-time
+                        client_name:
+                          type: string
+                          example: Wakeo
+                        departure_city:
+                          type: string
+                          example: Paris
+                        arrival_city:
+                          type: string
+                          example: Marseille
+                        active:
+                          type: boolean
+      /orders/refresh:
+        post:
+          summary: Orders Update
+          tags: 
+          - Internal
+          description: Forces orders refresh. Here data will be fetched from the [external API](#tag/External). 
+          responses:
+            '200':
+              description: No content
+      /external/api:
+        get:
+          summary: Orders Index
+          tags:
+          - External
+          description: "API that is called to update orders. Returns a list of orders.\n\n
+          The external API has a different signature from the internal, the data should be translated as follows :\n\n
+            `company` => `client_name` \n\n
+            `client_number` => `reference` \n\n
+            `dep_time` => `departure_date` \n\n
+            `arr_time` => `arrival_date` \n\n
+            `dep_city` => `departure_city` \n\n
+            `arr_city` => `arrival_city` \n\n
+          To identify an order we use the `reference` field which is unique.\n\n
+          The endpoint for the API is https://wakeo-technical-test.s3.eu-west-3.amazonaws.com/api.json\n\n
+          This API is updated once a day.
+          "
+          responses:
+            '200':
+              description: A JSON array of orders
+              content:
+                application/json:
+                  schema: 
+                    type: array
+                    items: 
+                      type: object
+                      properties:
+                        client_number:
+                          type: string
+                          example: 999-444-4444
+                        dep_time:
+                          type: string
+                          format: date-time
+                        arr_time:
+                          type: string
+                          format: date-time
+                        company:
+                          type: string
+                          example: Wakeo
+                        dep_city:
+                          type: string
+                          example: Paris
+                        arr_city:
+                          type: string
+                          example: Marseille
