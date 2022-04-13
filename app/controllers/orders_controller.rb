@@ -21,7 +21,8 @@ class OrdersController < ApplicationController
     @orders = Order.order(:departure_date).all
     @external_orders = JSON.parse(@response.body)
 
-    PATTERN = { "company" => "client_name", "client_number" => "reference", "dep_time" => "departure_date", "arr_time" => "arrival_date", "dep_city" => "departure_city", "arr_city" => "arrival_city" }
+    # PATTERN = { "company" => "client_name", "client_number" => "reference", "dep_time" => "departure_date", "arr_time" => "arrival_date", "dep_city" => "departure_city", "arr_city" => "arrival_city" }
+    # https://stackoverflow.com/questions/1865116/rails-replace-attributes-in-arrays
 
     @external_orders.inject({}) do |new_hash, (k, v)|
       key = PATTERN[k] || k
