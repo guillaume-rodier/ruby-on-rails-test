@@ -21,42 +21,23 @@ class OrdersController < ApplicationController
     @orders = Order.order(:departure_date).all
     @external_orders = JSON.parse(@response.body)
 
-    # PATTERN = {
-    #   "company" => "client_name",
-    #   "client_number" => "reference",
-    #   "dep_time" => "departure_date",
-    #   "arr_time" => "arrival_date",
-    #   "dep_city" => "departure_city",
-    #   "arr_city" => "arrival_city"
-    # }
-    # https://stackoverflow.com/questions/1865116/rails-replace-attributes-in-arrays
+    @external_orders.each do |external_order|
+      @local_order = Order.new(
+        client_name: external_order.company,
+        reference: external_order.client_number,
+        departure_date: external_order.dep_time,
+        arrival_date: external_order.arr_time,
+        departure_city: external_order.dep_city,
+        arrival_city: external_order.arr_city
+      )
 
-    # @external_orders.inject({}) do |new_hash, (k, v)|
-    #   key = PATTERN[k] || k
-    #   new_hash[key] = v
-    #   new_hash
-
-    #   p new_hash
-    # end
-
-
-    # TODO: map @external_orders and create item if not exist
-      # https://stackoverflow.com/questions/16682699/check-if-record-exists-from-controller-in-rails
-      # 1. Loop to map @external_orders + Check
-      # 2. For each items, check if exist
-      # =>  Update if exist
-      # 3. if not exist,
-      # =>  Create
-
-
-      # Ruby guide: https://guides.rubyonrails.org/getting_started.html
-      # example to create:
-      # article = Article.new(title: "Hello Rails", body: "I am on Rails!")
-
-      # Logicly to create in map
-      # order = Order.new(client_name: external_order["company"], reference: external_order["client_number"], ...)
-
-    p JSON.dump(JSON.parse(@orders).merge(@external_orders))
+      if Order.exists? reference: @local_order.reference
+        # Update order with id
+        local_order.save
+      else
+        local_order.save
+      end
+    end
 
     render json: JSON.parse(@response.body)
   end
